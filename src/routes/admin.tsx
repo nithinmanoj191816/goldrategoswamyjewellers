@@ -64,6 +64,11 @@ function AdminPage() {
     silver: String(data.rates.silver),
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [confirm, setConfirm] = useState<null | {
+    date: string;
+    rates: Record<RateKey, number>;
+    bigJumps: string[];
+  }>(null);
 
   useEffect(() => {
     if (!hydrated) return;
