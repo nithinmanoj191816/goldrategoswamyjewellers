@@ -29,6 +29,7 @@ function PublicRatePage() {
   const { data, hydrated } = useRates();
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const share = () => {
     const text = encodeURIComponent(buildShareText(data));
@@ -56,7 +57,45 @@ function PublicRatePage() {
   return (
     <main className="ivory-canvas min-h-screen px-4 py-10 sm:px-6 sm:py-16">
       <div className={`mx-auto w-full max-w-2xl ${hydrated ? "rise-in" : "opacity-0"}`}>
-        <RateCard ref={cardRef} data={data} />
+        {!open ? (
+          <section className="rounded-[2px] border border-primary/15 bg-card/70 px-6 py-14 text-center shadow-[0_24px_60px_-40px_rgba(6,78,59,0.5)] sm:px-12 sm:py-20">
+            <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-primary/25 bg-primary/5">
+              <Sparkles className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="mt-6 font-display text-4xl font-semibold tracking-[0.08em] text-primary sm:text-5xl">
+              {SHOP.name}
+            </h1>
+            <p className="mt-3 text-[10px] tracking-[0.4em] text-muted-foreground uppercase sm:text-xs">
+              {SHOP.subtitle}
+            </p>
+            <div className="gold-rule mx-auto mt-8 w-40" />
+            <p className="mt-8 text-sm leading-relaxed tracking-[0.14em] text-muted-foreground uppercase">
+              See the rates today
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button
+                onClick={() => setOpen(true)}
+                className="h-12 rounded-none bg-primary tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-emerald-mid"
+              >
+                <Eye className="mr-2 h-4 w-4" /> Open rate card
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="h-12 rounded-none border-primary/30 bg-transparent tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-secondary"
+              >
+                <Link to="/admin">
+                  <Pencil className="mr-2 h-4 w-4" /> Add / update rate
+                </Link>
+              </Button>
+            </div>
+          </section>
+        ) : (
+          <>
+            <div className="rise-in">
+              <RateCard ref={cardRef} data={data} />
+            </div>
+
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button
