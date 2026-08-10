@@ -239,6 +239,59 @@ function AdminPage() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+        <AlertDialogContent className="rounded-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 font-display tracking-[0.06em]">
+              <AlertTriangle className="h-5 w-5 text-destructive" /> Confirm rate update
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-left">
+                <p>
+                  You are publishing new rates for{" "}
+                  <span className="font-medium text-foreground">
+                    {confirm ? formatLongDate(confirm.date) : ""}
+                  </span>
+                  . These will be shown publicly to customers immediately.
+                </p>
+                <ul className="space-y-1 border border-border/70 p-3 text-sm tabular-nums">
+                  {PURITIES.map((p) => (
+                    <li key={p.key} className="flex justify-between gap-4">
+                      <span className="tracking-[0.14em] uppercase">
+                        {p.label} {p.sub}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {confirm
+                          ? formatRupees(confirm.rates[p.key], p.key === "silver" ? 2 : 0)
+                          : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {confirm && confirm.bigJumps.length > 0 && (
+                  <div className="border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                    <p className="font-medium">Caution: unusually large change (over 10%)</p>
+                    <ul className="mt-1 space-y-0.5">
+                      {confirm.bigJumps.map((j) => (
+                        <li key={j}>{j}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-2">Please double-check before publishing.</p>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-none uppercase">Go back</AlertDialogCancel>
+            <AlertDialogAction onClick={applySave} className="rounded-none uppercase">
+              Yes, publish rates
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
+
   );
 }
