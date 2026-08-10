@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, MessageCircle, Phone } from "lucide-react";
+import { Download, Eye, MessageCircle, Pencil, Phone, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { RateCard } from "@/components/RateCard";
 import { Button } from "@/components/ui/button";
