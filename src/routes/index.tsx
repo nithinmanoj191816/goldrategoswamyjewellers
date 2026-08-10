@@ -97,24 +97,36 @@ function PublicRatePage() {
             </div>
 
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button
-            onClick={share}
-            className="h-12 rounded-none bg-primary tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-emerald-mid"
-          >
-            <MessageCircle className="mr-2 h-4 w-4" />
-            Share on WhatsApp
-          </Button>
-          <Button
-            variant="outline"
-            onClick={download}
-            disabled={busy}
-            className="h-12 rounded-none border-primary/30 bg-transparent tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-secondary"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            {busy ? "Preparing…" : "Download card"}
-          </Button>
-        </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <Button
+                onClick={share}
+                className="h-12 rounded-none bg-primary tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-emerald-mid"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Share on WhatsApp
+              </Button>
+              <Button
+                variant="outline"
+                onClick={download}
+                disabled={busy}
+                className="h-12 rounded-none border-primary/30 bg-transparent tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-secondary"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {busy ? "Preparing…" : "Download card"}
+              </Button>
+              <Button
+                asChild
+                variant="ghost"
+                className="h-12 rounded-none tracking-[0.18em] uppercase"
+              >
+                <Link to="/admin">
+                  <Pencil className="mr-2 h-4 w-4" /> Add rate
+                </Link>
+              </Button>
+            </div>
+          </>
+        )}
+
 
         <div className="gold-rule mx-auto mt-12 w-full max-w-md" />
 
