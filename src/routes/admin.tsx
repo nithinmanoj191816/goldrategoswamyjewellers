@@ -112,17 +112,32 @@ function AdminPage() {
       toast.error("Please correct the highlighted fields.");
       return;
     }
-    save({
-      date: parsed.data.date,
-      rates: {
-        k22: Number(parsed.data.k22),
-        k18: Number(parsed.data.k18),
-        k9: Number(parsed.data.k9),
-        silver: Number(parsed.data.silver),
-      },
-    });
+    const nextRates = {
+      k22: Number(parsed.data.k22),
+      k18: Number(parsed.data.k18),
+      k9: Number(parsed.data.k9),
+      silver: Number(parsed.data.silver),
+    } as Record<RateKey, number>;
+
+    const bigJumps = PURITIES.filter((p) => {
+      const old = data.rates[p.key];
+      if (!old) return false;
+      return Math.abs(nextRates[p.key] - old) / old > 0.1;
+    }).map(
+      (p) =>
+        `${p.label} ${p.sub}: ${formatRupees(data.rates[p.key], p.key === "silver" ? 2 : 0)} → ${formatRupees(nextRates[p.key], p.key === "silver" ? 2 : 0)}`,
+    );
+
+    setConfirm({ date: parsed.data.date, rates: nextRates, bigJumps });
+  };
+
+  const applySave = () => {
+    if (!confirm) return;
+    save({ date: confirm.date, rates: confirm.rates });
+    setConfirm(null);
     toast.success("Rates updated successfully.");
   };
+
 
   return (
     <main className="ivory-canvas min-h-screen px-4 py-10 sm:px-6 sm:py-14">
