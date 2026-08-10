@@ -86,13 +86,11 @@ export function useRates() {
   return { data, hydrated, save, reset };
 }
 
-const inr = new Intl.NumberFormat("en-IN", {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
-});
-
-export function formatRupees(value: number) {
-  return `₹${inr.format(value)}`;
+export function formatRupees(value: number, minDecimals = 0) {
+  return `₹${new Intl.NumberFormat("en-IN", {
+    minimumFractionDigits: minDecimals,
+    maximumFractionDigits: 2,
+  }).format(value)}`;
 }
 
 export function formatLongDate(iso: string) {
@@ -111,7 +109,8 @@ export function formatLongDate(iso: string) {
 
 export function buildShareText(data: RateData) {
   const lines = PURITIES.map(
-    (p) => `${p.label} ${p.sub} — ${formatRupees(data.rates[p.key])} / gram`,
+    (p) =>
+      `${p.label} ${p.sub} — ${formatRupees(data.rates[p.key], p.key === "silver" ? 2 : 0)} / gram`,
   );
   return [
     `*${SHOP.name}* — ${SHOP.subtitle}`,

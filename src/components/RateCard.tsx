@@ -91,11 +91,11 @@ export const RateCard = forwardRef<HTMLDivElement, Props>(function RateCard({ da
               </div>
               <div className="shrink-0 text-right">
                 <p
-                  className={`font-display leading-none font-semibold tabular-nums gold-text ${
+                  className={`font-display leading-none font-semibold [font-variant-numeric:lining-nums_tabular-nums] gold-text ${
                     i === 0 ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"
                   }`}
                 >
-                  {formatRupees(data.rates[p.key])}
+                  {formatRupees(data.rates[p.key], p.key === "silver" ? 2 : 0)}
                 </p>
                 <p className="mt-1.5 text-[10px] tracking-[0.24em] text-ivory/55 uppercase">
                   {p.unit}
