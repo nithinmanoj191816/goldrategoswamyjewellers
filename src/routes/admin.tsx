@@ -1,13 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, RotateCcw } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { RateCard } from "@/components/RateCard";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PURITIES, type RateKey, useRates } from "@/lib/rates";
+import { PURITIES, formatLongDate, formatRupees, type RateKey, useRates } from "@/lib/rates";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -54,6 +64,11 @@ function AdminPage() {
     silver: String(data.rates.silver),
   });
   const [errors, setErrors] = useState<Errors>({});
+  const [confirm, setConfirm] = useState<null | {
+    date: string;
+    rates: Record<RateKey, number>;
+    bigJumps: string[];
+  }>(null);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -97,17 +112,32 @@ function AdminPage() {
       toast.error("Please correct the highlighted fields.");
       return;
     }
-    save({
-      date: parsed.data.date,
-      rates: {
-        k22: Number(parsed.data.k22),
-        k18: Number(parsed.data.k18),
-        k9: Number(parsed.data.k9),
-        silver: Number(parsed.data.silver),
-      },
-    });
+    const nextRates = {
+      k22: Number(parsed.data.k22),
+      k18: Number(parsed.data.k18),
+      k9: Number(parsed.data.k9),
+      silver: Number(parsed.data.silver),
+    } as Record<RateKey, number>;
+
+    const bigJumps = PURITIES.filter((p) => {
+      const old = data.rates[p.key];
+      if (!old) return false;
+      return Math.abs(nextRates[p.key] - old) / old > 0.1;
+    }).map(
+      (p) =>
+        `${p.label} ${p.sub}: ${formatRupees(data.rates[p.key], p.key === "silver" ? 2 : 0)} → ${formatRupees(nextRates[p.key], p.key === "silver" ? 2 : 0)}`,
+    );
+
+    setConfirm({ date: parsed.data.date, rates: nextRates, bigJumps });
+  };
+
+  const applySave = () => {
+    if (!confirm) return;
+    save({ date: confirm.date, rates: confirm.rates });
+    setConfirm(null);
     toast.success("Rates updated successfully.");
   };
+
 
   return (
     <main className="ivory-canvas min-h-screen px-4 py-10 sm:px-6 sm:py-14">
@@ -209,6 +239,59 @@ function AdminPage() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
+        <AlertDialogContent className="rounded-none">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 font-display tracking-[0.06em]">
+              <AlertTriangle className="h-5 w-5 text-destructive" /> Confirm rate update
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 text-left">
+                <p>
+                  You are publishing new rates for{" "}
+                  <span className="font-medium text-foreground">
+                    {confirm ? formatLongDate(confirm.date) : ""}
+                  </span>
+                  . These will be shown publicly to customers immediately.
+                </p>
+                <ul className="space-y-1 border border-border/70 p-3 text-sm tabular-nums">
+                  {PURITIES.map((p) => (
+                    <li key={p.key} className="flex justify-between gap-4">
+                      <span className="tracking-[0.14em] uppercase">
+                        {p.label} {p.sub}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        {confirm
+                          ? formatRupees(confirm.rates[p.key], p.key === "silver" ? 2 : 0)
+                          : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {confirm && confirm.bigJumps.length > 0 && (
+                  <div className="border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                    <p className="font-medium">Caution: unusually large change (over 10%)</p>
+                    <ul className="mt-1 space-y-0.5">
+                      {confirm.bigJumps.map((j) => (
+                        <li key={j}>{j}</li>
+                      ))}
+                    </ul>
+                    <p className="mt-2">Please double-check before publishing.</p>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="rounded-none uppercase">Go back</AlertDialogCancel>
+            <AlertDialogAction onClick={applySave} className="rounded-none uppercase">
+              Yes, publish rates
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </main>
+
   );
 }
