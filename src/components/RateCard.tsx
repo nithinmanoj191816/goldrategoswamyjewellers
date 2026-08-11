@@ -47,7 +47,7 @@ export const RateCard = forwardRef<HTMLDivElement, Props>(function RateCard({ da
               {SHOP.monogram}
             </span>
           </div>
-          <h1 className="mt-5 font-display text-4xl leading-none font-semibold tracking-[0.14em] gold-text sm:text-5xl">
+          <h1 className="mt-5 font-display text-[1.75rem] leading-tight font-semibold tracking-[0.1em] gold-text sm:text-4xl">
             {SHOP.name}
           </h1>
           <p className="mt-3 text-[10px] tracking-[0.42em] text-ivory/70 uppercase sm:text-xs">
