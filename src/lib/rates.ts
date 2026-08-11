@@ -23,8 +23,16 @@ export type RateData = {
   rates: Record<RateKey, number>;
 };
 
+export function todayISO() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export const DEFAULT_RATES: RateData = {
-  date: "2026-08-10",
+  date: todayISO(),
   rates: { k22: 14348, k18: 11739, k9: 6706, silver: 244 },
 };
 
@@ -46,8 +54,13 @@ function parse(raw: string | null): RateData | null {
 
 export function readRates(): RateData {
   if (typeof window === "undefined") return DEFAULT_RATES;
-  return parse(window.localStorage.getItem(STORAGE_KEY)) ?? DEFAULT_RATES;
+  const stored = parse(window.localStorage.getItem(STORAGE_KEY));
+  if (!stored) return { ...DEFAULT_RATES, date: todayISO() };
+  // Date always follows the current day unless the owner set a future date.
+  const today = todayISO();
+  return { ...stored, date: stored.date > today ? stored.date : today };
 }
+
 
 const EVENT = "sm-gold-rates-change";
 
@@ -95,6 +108,7 @@ export function formatLongDate(iso: string) {
   const date = new Date(Date.UTC(y, m - 1, d));
   return date
     .toLocaleDateString("en-GB", {
+      weekday: "long",
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -102,6 +116,7 @@ export function formatLongDate(iso: string) {
     })
     .toUpperCase();
 }
+
 
 export function buildShareText(data: RateData) {
   const lines = PURITIES.map(

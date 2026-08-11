@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Eye, MessageCircle, Pencil, Phone, Sparkles } from "lucide-react";
+import { Download, Eye, MessageCircle, Pencil, Phone } from "lucide-react";
 import { toast } from "sonner";
 import { RateCard } from "@/components/RateCard";
 import { Button } from "@/components/ui/button";
@@ -104,8 +104,11 @@ function PublicRatePage() {
         {!open ? (
           <section className="rounded-[2px] border border-primary/15 bg-card/70 px-6 py-14 text-center shadow-[0_24px_60px_-40px_rgba(6,78,59,0.5)] sm:px-12 sm:py-20">
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-full border border-primary/25 bg-primary/5">
-              <Sparkles className="h-6 w-6 text-primary" />
+              <span className="font-display text-2xl font-semibold tracking-[0.08em] text-primary">
+                {SHOP.monogram}
+              </span>
             </div>
+
             <h1 className="mt-6 font-display text-4xl font-semibold tracking-[0.08em] text-primary sm:text-5xl">
               {SHOP.name}
             </h1>
