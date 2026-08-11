@@ -108,6 +108,7 @@ export function formatLongDate(iso: string) {
   const date = new Date(Date.UTC(y, m - 1, d));
   return date
     .toLocaleDateString("en-GB", {
+      weekday: "long",
       day: "2-digit",
       month: "long",
       year: "numeric",
@@ -115,6 +116,7 @@ export function formatLongDate(iso: string) {
     })
     .toUpperCase();
 }
+
 
 export function buildShareText(data: RateData) {
   const lines = PURITIES.map(
