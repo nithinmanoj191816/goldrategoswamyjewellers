@@ -1,16 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 
 export const SHOP = {
-  name: "SM GOLD",
+  name: "GOSWAMY JEWELLERS",
   subtitle: "Jewelry Store",
-  monogram: "SM",
-  addressLines: [
-    "D.NO 13/448 MAIN ROAD",
-    "CHINNA BAZAR, NEAR KAKARLAVARI STREET",
-    "NELLORE, A.P.",
-  ],
-  phones: ["+91 9440111113", "+91 8759999932"],
-  whatsapp: "919440111113",
+  monogram: "GJ",
+  addressLines: ["6/323 DIAMOND BAZAR", "MACHILIPATNAM, A.P."],
+  phones: ["+91 9032963855"],
+  whatsapp: "919032963855",
 } as const;
 
 export type RateKey = "k22" | "k18" | "k9" | "silver";
