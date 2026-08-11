@@ -9,17 +9,20 @@ import { SHOP, buildShareText, useRates } from "@/lib/rates";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SM Gold — Today's Gold & Silver Rate | Nellore Jewellers" },
+      { title: "Goswamy Jewellers — Today's Gold & Silver Rate | Machilipatnam" },
       {
         name: "description",
         content:
-          "Daily 22K, 18K, 9K gold and silver rates per gram from SM Gold, Main Road, Chinna Bazar, Nellore. Rates inclusive of GST.",
+          "Daily 22K, 18K, 9K gold and silver rates per gram from Goswamy Jewellers, 6/323 Diamond Bazar, Machilipatnam. Rates inclusive of GST.",
       },
-      { property: "og:title", content: "SM Gold — Today's Gold & Silver Rate" },
+      { property: "og:title", content: "Goswamy Jewellers — Today's Gold & Silver Rate" },
       {
         property: "og:description",
-        content: "Live daily gold and silver rate card from SM Gold Jewelry Store, Nellore.",
+        content:
+          "Live daily gold and silver rate card from Goswamy Jewellers, Diamond Bazar, Machilipatnam.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: PublicRatePage,
@@ -29,23 +32,64 @@ function PublicRatePage() {
   const { data, hydrated } = useRates();
   const cardRef = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const share = () => {
-    const text = encodeURIComponent(buildShareText(data));
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
+  const makeCardFile = async () => {
+    if (!cardRef.current) return null;
+    const { toBlob } = await import("html-to-image");
+    const blob = await toBlob(cardRef.current, { pixelRatio: 2, cacheBust: true });
+    if (!blob) return null;
+    return new File([blob], `goswamy-jewellers-rate-${data.date}.png`, { type: "image/png" });
+  };
+
+  const share = async () => {
+    setSharing(true);
+    try {
+      const text = buildShareText(data);
+      const file = await makeCardFile();
+      const nav = navigator as Navigator & {
+        canShare?: (d: ShareData) => boolean;
+      };
+      if (file && nav.canShare?.({ files: [file] })) {
+        await nav.share({ files: [file], text });
+        return;
+      }
+      // Fallback: save the card image, then open WhatsApp with the text
+      if (file) {
+        const url = URL.createObjectURL(file);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Card image saved — attach it in WhatsApp.");
+      }
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+    } catch (err) {
+      if ((err as Error)?.name !== "AbortError") {
+        toast.error("Could not share the card. Please try again.");
+      }
+    } finally {
+      setSharing(false);
+    }
   };
 
   const download = async () => {
-    if (!cardRef.current) return;
     setBusy(true);
     try {
-      const { toPng } = await import("html-to-image");
-      const url = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true });
+      const file = await makeCardFile();
+      if (!file) throw new Error("no image");
+      const url = URL.createObjectURL(file);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `sm-gold-rate-${data.date}.png`;
+      a.download = file.name;
       a.click();
+      URL.revokeObjectURL(url);
       toast.success("Rate card image downloaded.");
     } catch {
       toast.error("Could not create the image. Please try again.");
