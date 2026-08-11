@@ -144,10 +144,11 @@ function PublicRatePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button
                 onClick={share}
+                disabled={sharing}
                 className="h-12 rounded-none bg-primary tracking-[0.18em] uppercase transition-transform hover:-translate-y-0.5 hover:bg-emerald-mid"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Share on WhatsApp
+                {sharing ? "Preparing…" : "Share card"}
               </Button>
               <Button
                 variant="outline"
