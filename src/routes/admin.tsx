@@ -55,6 +55,7 @@ type FormValues = z.infer<typeof formSchema>;
 type Errors = Partial<Record<keyof FormValues, string>>;
 
 function AdminPage() {
+  console.log("DBG AdminPage render");
   const { data, hydrated, save, reset } = useRates();
   const [values, setValues] = useState<FormValues>({
     date: data.date,
@@ -140,158 +141,9 @@ function AdminPage() {
 
 
   return (
-    <main className="ivory-canvas min-h-screen px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mx-auto w-full max-w-5xl">
-        <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-          <div className="min-w-0">
-            <p className="text-[10px] tracking-[0.34em] text-muted-foreground uppercase">
-              SM Gold · Internal
-            </p>
-            <h1 className="mt-2 truncate font-display text-3xl font-semibold tracking-[0.06em] text-primary sm:text-4xl">
-              Manage Rates
-            </h1>
-          </div>
-          <Button asChild variant="ghost" className="shrink-0 rounded-none uppercase">
-            <Link to="/">
-              <ArrowLeft className="mr-2 h-4 w-4" /> Rate card
-            </Link>
-          </Button>
-        </header>
-
-        <div className="gold-rule mt-6" />
-
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
-          <form onSubmit={onSubmit} noValidate className="space-y-7">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-[11px] tracking-[0.24em] uppercase">
-                Rate date
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={values.date}
-                onChange={(e) => set("date", e.target.value)}
-                aria-invalid={!!errors.date}
-                className="h-12 rounded-none border-input bg-card"
-              />
-              {errors.date && <p className="text-xs text-destructive">{errors.date}</p>}
-            </div>
-
-            <div className="space-y-5">
-              {PURITIES.map((p) => (
-                <div key={p.key} className="space-y-2">
-                  <Label htmlFor={p.key} className="text-[11px] tracking-[0.24em] uppercase">
-                    {p.label} {p.sub}{" "}
-                    <span className="text-muted-foreground normal-case">(fixed category)</span>
-                  </Label>
-                  <div className="relative">
-                    <span className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground">
-                      ₹
-                    </span>
-                    <Input
-                      id={p.key}
-                      inputMode="decimal"
-                      value={values[p.key]}
-                      onChange={(e) => set(p.key, e.target.value)}
-                      aria-invalid={!!errors[p.key]}
-                      className="h-12 rounded-none border-input bg-card pr-20 pl-9 tabular-nums"
-                    />
-                    <span className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
-                      / gram
-                    </span>
-                  </div>
-                  {errors[p.key] && <p className="text-xs text-destructive">{errors[p.key]}</p>}
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button
-                type="submit"
-                className="h-12 rounded-none tracking-[0.18em] uppercase hover:bg-emerald-mid"
-              >
-                <Check className="mr-2 h-4 w-4" /> Save &amp; publish
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  reset();
-                  toast.success("Restored the default rates.");
-                }}
-                className="h-12 rounded-none border-primary/30 bg-transparent tracking-[0.18em] uppercase"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" /> Reset to defaults
-              </Button>
-            </div>
-
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              Purity categories are fixed and cannot be edited. Saved rates are stored on this
-              device and appear instantly on the public rate card.
-            </p>
-          </form>
-
-          <div>
-            <p className="mb-4 text-[10px] tracking-[0.3em] text-muted-foreground uppercase">
-              Live preview
-            </p>
-            <RateCard data={preview} />
-          </div>
-        </div>
-      </div>
-
-      <AlertDialog open={!!confirm} onOpenChange={(o) => !o && setConfirm(null)}>
-        <AlertDialogContent className="rounded-none">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 font-display tracking-[0.06em]">
-              <AlertTriangle className="h-5 w-5 text-destructive" /> Confirm rate update
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3 text-left">
-                <p>
-                  You are publishing new rates for{" "}
-                  <span className="font-medium text-foreground">
-                    {confirm ? formatLongDate(confirm.date) : ""}
-                  </span>
-                  . These will be shown publicly to customers immediately.
-                </p>
-                <ul className="space-y-1 border border-border/70 p-3 text-sm tabular-nums">
-                  {PURITIES.map((p) => (
-                    <li key={p.key} className="flex justify-between gap-4">
-                      <span className="tracking-[0.14em] uppercase">
-                        {p.label} {p.sub}
-                      </span>
-                      <span className="font-medium text-foreground">
-                        {confirm
-                          ? formatRupees(confirm.rates[p.key], p.key === "silver" ? 2 : 0)
-                          : ""}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {confirm && confirm.bigJumps.length > 0 && (
-                  <div className="border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-                    <p className="font-medium">Caution: unusually large change (over 10%)</p>
-                    <ul className="mt-1 space-y-0.5">
-                      {confirm.bigJumps.map((j) => (
-                        <li key={j}>{j}</li>
-                      ))}
-                    </ul>
-                    <p className="mt-2">Please double-check before publishing.</p>
-                  </div>
-                )}
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-none uppercase">Go back</AlertDialogCancel>
-            <AlertDialogAction onClick={applySave} className="rounded-none uppercase">
-              Yes, publish rates
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+    <main className="ivory-canvas min-h-screen px-4 py-10">
+      <p>TEST LABEL ONLY</p>
+      <Label htmlFor="date">Rate date</Label>
     </main>
-
   );
 }

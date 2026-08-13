@@ -65,10 +65,12 @@ export function readRates(): RateData {
 const EVENT = "sm-gold-rates-change";
 
 export function useRates() {
+  console.log("DBG useRates render");
   const [data, setData] = useState<RateData>(DEFAULT_RATES);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    console.log("DBG useRates effect");
     setData(readRates());
     setHydrated(true);
     const sync = () => setData(readRates());
