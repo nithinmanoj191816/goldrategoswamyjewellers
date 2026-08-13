@@ -142,8 +142,10 @@ function AdminPage() {
 
   return (
     <main className="ivory-canvas min-h-screen px-4 py-10">
-      <p>TEST LABEL ONLY</p>
-      <Label htmlFor="date">Rate date</Label>
+      <p>TEST FORM SUBMIT</p>
+      <form onSubmit={onSubmit} noValidate>
+        <Button type="submit">Save</Button>
+      </form>
     </main>
   );
 }
