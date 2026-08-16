@@ -111,7 +111,7 @@ function RootShell({ children }: { children: ReactNode }) {
   // shell again would make React claim the real <head>/<body> host singletons
   // and break event/selection handling. Render the app only; React 19 hoists
   // the <HeadContent /> tags into the document head by itself.
-  if (import.meta.env.VITE_STATIC_PAGES) {
+  if (import.meta.env['VITE_STATIC_PAGES']) {
     return (
       <>
         <HeadContent />
