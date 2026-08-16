@@ -27,6 +27,9 @@ export default defineConfig({
   root: resolve(import.meta.dirname, "static"),
   publicDir: resolve(import.meta.dirname, "public"),
   plugins: [react(), tailwindcss(), tsConfigPaths(), spaFallback],
+  // Flags the client-only build so the root route skips the SSR document shell.
+  define: { "import.meta.env.VITE_STATIC_PAGES": JSON.stringify("1") },
+
   resolve: {
     alias: { "@": resolve(import.meta.dirname, "src") },
   },
