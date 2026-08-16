@@ -106,6 +106,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 
 function RootShell({ children }: { children: ReactNode }) {
+  // Static (GitHub Pages) build: index.html already provides <html>/<head>/<body>
+  // and the app mounts with createRoot into #root, so rendering the document
+  // shell again would make React claim the real <head>/<body> host singletons
+  // and break event/selection handling. Render the app only; React 19 hoists
+  // the <HeadContent /> tags into the document head by itself.
+  if (import.meta.env.VITE_STATIC_PAGES) {
+    return (
+      <>
+        <HeadContent />
+        {children}
+      </>
+    );
+  }
+
   return (
     <html lang="en">
       <head>
@@ -118,6 +132,7 @@ function RootShell({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
